@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 //endpoint to get temp
-app.get('/paulweather', (req,res) =>{
+app.get('/weather', (req,res) =>{
 
 sensor.read(22, 4, function(err, temperature, humidity) {
   console.log("temp", temperature);
@@ -72,9 +72,9 @@ io.on('connection', (socket) => {
 });
 });
 
-setInterval(() => {
-  takePic();
-},30000)
+// setInterval(() => {
+//   takePic();
+// },30000);
 
 //CAMERA
 function takePic(value) {
@@ -85,8 +85,7 @@ function takePic(value) {
     .snap()
     .then((result) => {
       //let front end know it needs to update
-      io.sockets.emit('updatePic',`./${timestamp}.jpg`);
-      
+      io.sockets.emit('updatePic',`./${timestamp}.jpg`); 
     })
     .catch(err => {
       console.log(err);

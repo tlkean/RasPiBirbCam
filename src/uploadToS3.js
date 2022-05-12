@@ -1,7 +1,8 @@
+const config = require('../config');
 var AWS = require("aws-sdk");
 var fs = (fs = require("fs"));
 
-const credentials = new AWS.SharedIniFileCredentials({ profile: "default" });
+const credentials = new AWS.SharedIniFileCredentials({ profile: config.PROFILE });
 AWS.config.credentials = credentials;
 AWS.config.update({ region: "us-east-1" });
 

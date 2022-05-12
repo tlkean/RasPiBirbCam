@@ -1,3 +1,4 @@
+const config = require('./config');
 var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
@@ -13,8 +14,8 @@ const fs = require('fs');
 const cors = require('cors');
 
 const pins = {
-  led: new Gpio(17,'out'),
-  lamp: new Gpio(27,'out')
+  led: new Gpio(17, 'out'),
+  lamp: new Gpio(27, 'out')
 }
 
 app.use(cors());
@@ -28,27 +29,27 @@ app.get('/', (req, res) => {
 });
 
 //endpoint to get temp
-app.get('/weather', (req,res) =>{
+app.get('/temp', (req, res) => {
 
-sensor.read(22, 4, function(err, temperature, humidity) {
-  console.log("temp", temperature);
-  if (!err) {
-    //console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
-   res.json({'Celsius':temperature,'Humidity':humidity});
-  }
+  sensor.read(22, 4, function (err, temperature, humidity) {
+    console.log("temp", temperature);
+    if (!err) {
+      //console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
+      res.json({ 'Celsius': temperature, 'Humidity': humidity });
+    }
   });
 });
 
 //endpoint to take a pic - created to test upload to s3
-app.get('/image', (req,res) =>{
+app.get('/image', (req, res) => {
   var timestamp = new Date().getTime();
   camera.config.output = `${__dirname}/public/${timestamp}.jpg`;
-  
+
   camera
     .snap()
     .then((result) => {
-      uploadToS3.uploadFile(`${__dirname}/public/${timestamp}.jpg`,'prmr-picamera');
-      res.json({'image': `${camera.config.output}`});
+      uploadToS3.uploadFile(`${__dirname}/public/${timestamp}.jpg`, config.S3_BUCKET);
+      res.json({ 'image': `${camera.config.output}` });
     })
     .catch(err => {
       console.log(err);
@@ -56,20 +57,20 @@ app.get('/image', (req,res) =>{
 });
 
 io.on('connection', (socket) => {
-    //send to client (index.html) when connected
-    socket.emit('updateClient', update());
-    //received from client (index.html)
-    socket.on('updateServer', pin => {
-        togglePin(pin);
-    });
-    //CAMERA
-    socket.on('takePic', ()=> {
-      takePic();
-    });
- 
+  //send to client (index.html) when connected
+  socket.emit('updateClient', update());
+  //received from client (index.html)
+  socket.on('updateServer', pin => {
+    togglePin(pin);
+  });
+  //CAMERA
+  socket.on('takePic', () => {
+    takePic();
+  });
+
   socket.on('snapshot', (snapArray) => {
     readFolder();
-});
+  });
 });
 
 // setInterval(() => {
@@ -78,14 +79,13 @@ io.on('connection', (socket) => {
 
 //CAMERA
 function takePic(value) {
-  
   var timestamp = new Date().getTime();
   camera.config.output = `${__dirname}/public/${timestamp}.jpg`;
   camera
     .snap()
     .then((result) => {
       //let front end know it needs to update
-      io.sockets.emit('updatePic',`./${timestamp}.jpg`); 
+      io.sockets.emit('updatePic', `./${timestamp}.jpg`);
     })
     .catch(err => {
       console.log(err);
@@ -96,7 +96,6 @@ function takePic(value) {
 //and pass to front end - index.html. she showed all images taken
 //not just current
 function readFolder() {
-
   const currentDirectory = path.join(__dirname, 'public');
   let snapShotArray = [];
 
@@ -107,24 +106,26 @@ function readFolder() {
       files.map(file => {
         snapShotArray.push(file);
       })
-      io.sockets.emit('folderRead',snapShotArray);
+      io.sockets.emit('folderRead', snapShotArray);
     }
   })
 };
 
-function togglePin(pin){
-    pins[pin].writeSync(1-pins[pin].readSync());
-    io.sockets.emit('updateClient', update());
+function togglePin(pin) {
+  pins[pin].writeSync(1 - pins[pin].readSync());
+  io.sockets.emit('updateClient', update());
 }
 
-function update(){
+function update() {
   return {
-    led:pins.led.readSync(),
-    lamp:pins.lamp.readSync()
+    led: pins.led.readSync(),
+    lamp: pins.lamp.readSync()
   }
 }
 
-http.listen(3000, () => {
+const PORT = config.EXPRESS_PORT || 3000;
+
+http.listen(PORT, () => {
   console.log('listening on port 3000');
 });
 

@@ -6,7 +6,6 @@ const camera = new PiCamera({
     width: 640,
     height: 480,
     nopreview: true,
-    exposure: "on",
     rotation: 0
   });
 

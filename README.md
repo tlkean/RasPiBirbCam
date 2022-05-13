@@ -1,12 +1,10 @@
 # RaspberryPiServerWithCamera
 --
 ## Video overview
-https://www.screencast.com/t/YSYy40RWjRbI
+https://github.com/prichardsondev/RaspberryPiServerWithCamera
 
 ## Note: 
-Follow instructions here to get set up if necessary. Just clone this repo instead of the RaspberryPiServer repo.
-
-All other steps will be the same.  
+This assumes you've got through the steps at:
 https://github.com/prichardsondev/RaspberryPiServer
 
 ## Install awscli

@@ -1,7 +1,7 @@
 # RaspberryPiServerWithCamera
 --
 ## Video overview
-https://github.com/prichardsondev/RaspberryPiServerWithCamera
+https://www.screencast.com/t/m9KwHYRQAuwh
 
 ## Note: 
 This assumes you've got through the steps at:

@@ -31,7 +31,7 @@ app.get('/', (req, res) => {
 //endpoint to get temp
 app.get('/temp', (req, res) => {
 
-  sensor.read(22, 4, function (err, temperature, humidity) {
+  sensor.read(11, 4, function (err, temperature, humidity) {
     console.log("temp", temperature);
     if (!err) {
       //console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);

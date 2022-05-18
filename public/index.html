@@ -1,36 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/index.css">
     <title>BirbCam v1.0</title>
 </head>
+
 <body>
     <div class="container">
-        <h3>BirbCam v1.0</h3>
+        <h1>BirbCam v1.0</h1>
         <!-- <div class="box">
-            <h4>Light</h4>
+            <h2>Lamp</h2>
             <button class="button" id='lamp' onClick="toggle('lamp')">LED State</button>
         </div> -->
         <div class="box">
-            <h4>LED</h4>
-            <button class="button" id='led' onClick="toggle('led')">LED State</button>
-         </div>
-         <!-- <div class="box">
-            <h4>Silly</h4>
+            <h2>Light</h2>
+            <button class="button" id='led' onClick="toggle('led')">LED state</button>
+        </div>
+        <!-- <div class="box">
+            <h2>Silly</h2>
             <button class="button" id='silly' onClick="fireSilly()">Fire</button>
         </div>  -->
         <div class="box">
-            <h4>Snap</h4>
+            <h2>Snap</h2>
             <button class="button" id='snap' onClick="takePic()">Look at the birb</button>
-<!-- <button class="button" onClick="readFolder()">Read</button> -->
-         </div>
-        <div class="box">
-         <img id="pic">
+            <!-- <button class="button" onClick="readFolder()">Read</button> -->
+        </div>
+        <div class="box" id="picture">
+            <h2>Pic</h2>
+            <img id="pic">
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/index.js" type="text/javascript"></script>
 </body>
+
 </html>

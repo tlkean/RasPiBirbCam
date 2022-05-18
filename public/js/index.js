@@ -7,8 +7,8 @@ socket.on('updateClient', data => {
    // (data.lamp  === 0 ? (lamp.innerHTML = "Lamp Off", lamp.style.color = "#fff") :
    //     (lamp.innerHTML = "Lamp On", lamp.style.color = "#ffff00"));
 
-    (data.led === 0 ? (led.innerHTML = "LED Off", led.style.color = "#fff") :
-        (led.innerHTML = "LED On", led.style.color = "#ffff00"));
+    (data.led === 0 ? (led.innerHTML = "Turn on", led.style.color = "#fff") :
+        (led.innerHTML = "Turn off", led.style.color = "#ffff00"));
 });
 socket.on('updatePic', file  => {
   document.getElementById("pic").src = file;

@@ -14,8 +14,8 @@ const fs = require('fs');
 const cors = require('cors');
 
 const pins = {
-  led: new Gpio(17, 'out'),
-  lamp: new Gpio(27, 'out')
+  led: new Gpio(17,'out'),
+  lamp: new Gpio(27,'out')
 }
 
 app.use(cors());
@@ -29,48 +29,49 @@ app.get('/', (req, res) => {
 });
 
 //endpoint to get temp
-app.get('/temp', (req, res) => {
+app.get('/temp', (req,res) =>{
 
-  sensor.read(11, 4, function (err, temperature, humidity) {
-    console.log("temp", temperature);
-    if (!err) {
-      //console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
-      res.json({ 'Celsius': temperature, 'Humidity': humidity });
-    }
+sensor.read(11, 4, function(err, temperature, humidity) {
+  var fHeit = (temperature * 1.8) + 32;
+  console.log("temp", temperature);
+  if (!err) {
+    //console.log(`temp: ${temperature}°C, humidity: ${humidity}%`);
+   res.json({'Celsius':temperature,'Fahrenheit':fHeit,'Humidity':humidity});
+  }
   });
 });
 
 //endpoint to take a pic - created to test upload to s3
-app.get('/image', (req, res) => {
-  var timestamp = new Date().getTime();
-  camera.config.output = `${__dirname}/public/${timestamp}.jpg`;
-
-  camera
-    .snap()
-    .then((result) => {
-      uploadToS3.uploadFile(`${__dirname}/public/${timestamp}.jpg`, config.S3_BUCKET);
-      res.json({ 'image': `${camera.config.output}` });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
+//app.get('/image', (req,res) =>{
+  //var timestamp = new Date().getTime();
+  //camera.config.output = `${__dirname}/birbimgs/${timestamp}.jpg`;
+  
+  //camera
+    //.snap()
+    //.then((result) => {
+      //uploadToS3.uploadFile(`${__dirname}/birbimgs/${timestamp}.jpg`,config.s3_BUCKET);
+      //res.json({'image': `${camera.config.output}`});
+    //})
+    //.catch(err => {
+      //console.log(err);
+    //});
+//});
 
 io.on('connection', (socket) => {
-  //send to client (index.html) when connected
-  socket.emit('updateClient', update());
-  //received from client (index.html)
-  socket.on('updateServer', pin => {
-    togglePin(pin);
-  });
-  //CAMERA
-  socket.on('takePic', () => {
-    takePic();
-  });
-
-  socket.on('snapshot', (snapArray) => {
-    readFolder();
-  });
+    //send to client (index.html) when connected
+    socket.emit('updateClient', update());
+    //received from client (index.html)
+    socket.on('updateServer', pin => {
+        togglePin(pin);
+    });
+    //CAMERA
+    socket.on('takePic', ()=> {
+      takePic();
+    });
+ 
+  //socket.on('snapshot', (snapArray) => {
+    //readFolder();
+//});
 });
 
 // setInterval(() => {
@@ -79,13 +80,15 @@ io.on('connection', (socket) => {
 
 //CAMERA
 function takePic(value) {
+  
   var timestamp = new Date().getTime();
-  camera.config.output = `${__dirname}/public/${timestamp}.jpg`;
+  camera.config.output = `${__dirname}/public/birbimgs/${timestamp}.jpg`;
   camera
     .snap()
     .then((result) => {
+      uploadToS3.uploadFile(`${__dirname}/public/birbimgs/${timestamp}.jpg`,config.s3_BUCKET);
       //let front end know it needs to update
-      io.sockets.emit('updatePic', `./${timestamp}.jpg`);
+      io.sockets.emit('updatePic',`./birbimgs/${timestamp}.jpg`);
     })
     .catch(err => {
       console.log(err);
@@ -95,31 +98,32 @@ function takePic(value) {
 //student in past class wanted to know how to read all images
 //and pass to front end - index.html. she showed all images taken
 //not just current
-function readFolder() {
-  const currentDirectory = path.join(__dirname, 'public');
-  let snapShotArray = [];
+//function readFolder() {
 
-  fs.readdir(currentDirectory, (err, files) => {
-    if (err)
-      console.log(err);
-    else {
-      files.map(file => {
-        snapShotArray.push(file);
-      })
-      io.sockets.emit('folderRead', snapShotArray);
-    }
-  })
-};
+  //const currentDirectory = path.join(__dirname, 'public');
+  //let snapShotArray = [];
 
-function togglePin(pin) {
-  pins[pin].writeSync(1 - pins[pin].readSync());
-  io.sockets.emit('updateClient', update());
+  //fs.readdir(currentDirectory, (err, files) => {
+    //if (err)
+      //console.log(err);
+    //else {
+      //files.map(file => {
+        //snapShotArray.push(file);
+      //})
+      //io.sockets.emit('folderRead',snapShotArray);
+    //}
+  //})
+//};
+
+function togglePin(pin){
+    pins[pin].writeSync(1 - pins[pin].readSync());
+    io.sockets.emit('updateClient', update());
 }
 
-function update() {
+function update(){
   return {
-    led: pins.led.readSync(),
-    lamp: pins.lamp.readSync()
+    led:pins.led.readSync(),
+    lamp:pins.lamp.readSync()
   }
 }
 
